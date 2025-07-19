@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class JWTFilter  extends OncePerRequestFilter {
 	
 	private final UserPrinicipalServiceImpl JuserServiceImpl;
+	
 	private final JWTService jJwtService;
 
 	@Override

@@ -35,7 +35,7 @@ public class Role  implements Serializable {
 	@Column(nullable = false)
 	private String role;
 	
-	private String description; // @Column(nullable = false, unique = true)
+	private String description; 
 	
 	@ManyToMany
 	private Set<Users> users;

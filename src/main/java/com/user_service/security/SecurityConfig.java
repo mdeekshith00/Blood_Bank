@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -15,8 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.user_service.repositary.UserRepositary;
 import com.user_service.service.impl.UserPrinicipalServiceImpl;
-import com.user_service.service.impl.UsersServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,14 +25,19 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 	
 	private final JWTFilter sJWTFilter;
+	private final UserPrinicipalServiceImpl userPrinicipalServiceImpl ;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 				.csrf(r->r.disable())
-				.authorizeHttpRequests(request -> request.anyRequest().authenticated())
+				.authorizeHttpRequests(request -> request
+						 .requestMatchers("/user/sign-up" , "/user/sign-in").permitAll()
+						.anyRequest().authenticated())
 				.httpBasic(Customizer.withDefaults())
+				.formLogin(Customizer.withDefaults())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				   .authenticationProvider(authenticationProvider(userPrinicipalServiceImpl))
 				.addFilterBefore(sJWTFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
 	}
@@ -43,6 +47,7 @@ public class SecurityConfig {
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 		provider.setUserDetailsService(service);
 		provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
+
 		return provider;
 		
 	}

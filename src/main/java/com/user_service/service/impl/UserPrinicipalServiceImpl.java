@@ -1,7 +1,5 @@
 package com.user_service.service.impl;
 
-import java.util.List;
-
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserPrinicipalServiceImpl  implements UserDetailsService{
+public class UserPrinicipalServiceImpl  implements UserDetailsService {
 	
 	private final UserRepositary uUserRepositary;
 
@@ -29,10 +27,10 @@ public class UserPrinicipalServiceImpl  implements UserDetailsService{
 			Users user = uUserRepositary.findByUsername(username);
 			if(user == null)
 				throw  new  DetailsNotFoundException("UserName Not Found :" + user.getUsername());
-	return new User(user.getUsername(),user.getPassword(),List.of(new SimpleGrantedAuthority("Admin")));
-
-//			return user;
-		
+	return new User(user.getUsername(),user.getPassword(), 
+			user.getRoles().stream()
+            .map(role -> new SimpleGrantedAuthority(role.getRole()))
+            .toList() );
 
 	}
 

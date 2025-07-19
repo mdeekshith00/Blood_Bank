@@ -25,6 +25,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,8 +47,8 @@ public class Users  implements UserDetails , Serializable {
 	private static final long serialVersionUID = 2272601944381074300L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Integer uId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer userId;
 	@Column(nullable = false)
 	@Embedded
 	private FullName fullName;
@@ -63,14 +64,16 @@ public class Users  implements UserDetails , Serializable {
     private String bloodGroup;
     
 	private String gender;
-
+     @NotNull(message = "Email cant be Empty:")
 	private String eMail;
+	@Column(name = "address_type" , nullable = false)
+	private String addressType;
 	@Embedded
 	private Address address ;
 
-	private Boolean isAvailableToDonate;
-	
 	private LocalDate dateOfBirth;
+	
+	private Boolean isAvailableToDonate;
 	
 	private Boolean isActive;
 	

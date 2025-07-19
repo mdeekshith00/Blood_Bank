@@ -1,8 +1,94 @@
 package com.user_service.controller;
 
+import java.util.List;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.user_service.dto.MinUserDto;
+import com.user_service.dto.SearchDto;
+import com.user_service.dto.UserDto;
+import com.user_service.entities.Users;
+import com.user_service.service.UsersService;
+import com.user_service.vo.UsersVo;
+import com.user_service.vo.loginUservo;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
+@RequestMapping("/user")
+@RequiredArgsConstructor
+@Slf4j
 public class UsersController {
+	
+	private final UsersService userService;
+	
+	private final ModelMapper modelMapper;
+	
+	@PostMapping("/sign-up")
+	public ResponseEntity<UserDto> register(@RequestBody UsersVo userVo) {
+	  Users user = 	userService.register(userVo);
+	  UserDto userdto =   modelMapper.map(user, UserDto.class);
+		return  ResponseEntity.status(HttpStatus.CREATED).body(userdto);
+	}
+	
+	@PostMapping("/sign-in")
+	 public ResponseEntity<?>  login(@RequestBody loginUservo loginUservo) {
+		return ResponseEntity.ok().body(userService.login(loginUservo));
+				
+	}
+	
+	@PostMapping("/forgot-password/{username}")
+	public ResponseEntity<String> forgotPassword(@PathVariable String username) {
+		return ResponseEntity.status(HttpStatus.OK).body(userService.forgotPassword(username));
+	}
+	
+	@PostMapping("/reset-password/{username}")
+	public ResponseEntity<String>  resetPassword(@PathVariable String username  ,@RequestParam String resetPassword ,@RequestParam String password) {
+		return ResponseEntity.status(HttpStatus.OK).body(userService.resetPassword(username, resetPassword, password));
+	}
+	
+	 @GetMapping("/{userId}")
+	public ResponseEntity<UserDto> getUsersById(@PathVariable Integer userId) {
+		UserDto user = userService.getUsersById(userId);
+		return  ResponseEntity.status(HttpStatus.OK).body(user);
+	}
+	@PutMapping("/update/{userId}")
+	public ResponseEntity<MinUserDto> updateUsers(@PathVariable Integer userId,@RequestBody UsersVo userVo) {
+		return  ResponseEntity.status(HttpStatus.OK).body(userService.updateUsers(userId, userVo));
+	}
+	
+	@DeleteMapping("/delete/{userId}")
+	public ResponseEntity<?> deleteUser(@PathVariable Integer userId) {
+		return  ResponseEntity.status(HttpStatus.OK).body(userService.deleteUser(userId));
+	}
+	@PreAuthorize("ADMIN")
+	@GetMapping("/get-all")
+	public  ResponseEntity<List<?>> getAllUsers() {
+	   return  ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());
+	}
+	@GetMapping
+	public ResponseEntity<Page<SearchDto>> getByBloodGroupByUsers(
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size,
+	        @RequestParam String bloodGroup) {
+
+	    return ResponseEntity.ok(userService.getPaginatedUsersandBloodGroup(page, size, bloodGroup));
+	} 
+
 
 }

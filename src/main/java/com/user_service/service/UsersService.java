@@ -1,14 +1,37 @@
 package com.user_service.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+
+
+import com.user_service.dto.MinUserDto;
+import com.user_service.dto.SearchDto;
+import com.user_service.dto.UserDto;
 import com.user_service.entities.Users;
 import com.user_service.vo.UsersVo;
+import com.user_service.vo.loginUservo;
 
 public interface UsersService {
-	Users addUsers(UsersVo userVo);
-	Users getUsersById(Integer uId);
-	Users updateUsers(Integer uId, UsersVo userVo);
-	void deleteUsers(Integer uId);
-	Users getAllUsers();
+	
+	Users register(UsersVo userVo);
+	
+	String  login(loginUservo loginUservo);
+	
+	UserDto getUsersById(Integer userId);
+	
+	MinUserDto updateUsers(Integer userId, UsersVo userVo);
+	
+	String deleteUser(Integer userId);
+	
+	List<Users> getAllUsers();
+	
+	 Page<SearchDto> getPaginatedUsersandBloodGroup(int page, int size, String bloodGroup);
+	 
+	 String forgotPassword(String username);
+	 
+	  String resetPassword(String username , String resetPassword , String password);
 
 }
  
