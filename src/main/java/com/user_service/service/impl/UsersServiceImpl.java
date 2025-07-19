@@ -154,17 +154,19 @@ public class UsersServiceImpl implements UsersService {
 		// TODO Auto-generated method stub
 	  Users user = 	userRepositary.findById(userId)
 		.orElseThrow(() ->  new UserDetailsNotFoundException("User Deatils Not Found On This ID: " + userId) );
-	  
-		user.setIsActive(null);
-//		Optional.of(user.setIsActive(null));
-		user.setIsPhoneNumberVerified(null);
-		user.setIsAvailableToDonate(null);
-		try {
-			userRepositary.save(user);
-		}catch (Exception e) {
-		    e.printStackTrace();  // This gives the root cause
-		    throw new RuntimeException("Error during DB transaction: " + e.getMessage());
-		}
+	    if(Boolean.TRUE.equals(user.getIsActive()) && Boolean.TRUE.equals(user.getIsPhoneNumberVerified()) &&
+	    		Boolean.TRUE.equals(user.getIsAvailableToDonate())) 
+	    {
+		
+		Optional.ofNullable(user.getIsActive().equals(null)).orElse(null);
+		Optional.ofNullable(user.getIsPhoneNumberVerified().equals(null)).orElse(null);
+		Optional.ofNullable(user.getIsAvailableToDonate().equals(null)).orElse(null);
+		
+	    }
+	    else {
+	    	throw new DetailsNotFoundException("User is not ready  to delete : " + user.getUsername());
+	    }
+		
 	
 		return "User deleted on this Id: " + user.getUserId() + " on this Username " + user.getUsername();
 	}
