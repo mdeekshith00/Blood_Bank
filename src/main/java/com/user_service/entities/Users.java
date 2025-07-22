@@ -73,10 +73,11 @@ public class Users  implements UserDetails , Serializable {
 	private Address address ;
     @Past
 	private LocalDate dateOfBirth;
-	
+    private String donationEligibilityStatus;
 	private Boolean isAvailableToDonate;
 	
 	private Boolean isActive;
+	private String status; // e.g., "ACTIVE", "INACTIVE", "BANNED", "PENDING_APPROVAL"
 	
 	private Long loginCount;
 	
