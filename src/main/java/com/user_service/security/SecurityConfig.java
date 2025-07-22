@@ -32,7 +32,7 @@ public class SecurityConfig {
 		return http
 				.csrf(r->r.disable())
 				.authorizeHttpRequests(request -> request
-						 .requestMatchers("/user/sign-up" , "/user/sign-in").permitAll()
+						 .requestMatchers("/user/sign-up" , "/user/sign-in" , "/user/refresh-token/**").permitAll()
 						.anyRequest().authenticated())
 				.httpBasic(Customizer.withDefaults())
 				.formLogin(Customizer.withDefaults())

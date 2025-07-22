@@ -6,7 +6,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.user_service.dto.MinUserDto;
+import com.user_service.dto.RefreshTokenRequest;
 import com.user_service.dto.SearchDto;
 import com.user_service.dto.UserDto;
-import com.user_service.entities.Users;
 import com.user_service.service.UsersService;
 import com.user_service.vo.UsersVo;
 import com.user_service.vo.loginUservo;
@@ -36,12 +35,12 @@ import lombok.extern.slf4j.Slf4j;
 public class UsersController {
 	
 	private final UsersService userService;
-	
+//	private final RefreshTokenService refreshTokenService;
 	private final ModelMapper modelMapper;
 	
 	@PostMapping("/sign-up")
 	public ResponseEntity<UserDto> register(@RequestBody UsersVo userVo) {
-	  Users user = 	userService.register(userVo);
+		UserDto user = 	userService.register(userVo);
 	  UserDto userdto =   modelMapper.map(user, UserDto.class);
 		return  ResponseEntity.status(HttpStatus.CREATED).body(userdto);
 	}
@@ -51,6 +50,10 @@ public class UsersController {
 		return ResponseEntity.ok().body(userService.login(loginUservo));
 				
 	}
+	@PostMapping("/refresh-token")
+	 public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
+			return ResponseEntity.ok().body(userService.refreshToken(request));
+	  }
 	
 	@PostMapping("/forgot-password/{username}")
 	public ResponseEntity<String> forgotPassword(@PathVariable String username) {
@@ -72,12 +75,12 @@ public class UsersController {
 		return  ResponseEntity.status(HttpStatus.OK).body(userService.updateUsers(userId, userVo));
 	}
 	
-	@DeleteMapping("/delete/{userId}")
+	@DeleteMapping(path = "/delete/{userId}")
 	public ResponseEntity<?> deleteUser(@PathVariable Integer userId) {
 		return  ResponseEntity.status(HttpStatus.OK).body(userService.deleteUser(userId));
 	}
 	@PreAuthorize("ADMIN")
-	@GetMapping("/get-all")
+	@GetMapping(path = "/get-all")
 	public  ResponseEntity<List<?>> getAllUsers() {
 	   return  ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());
 	}

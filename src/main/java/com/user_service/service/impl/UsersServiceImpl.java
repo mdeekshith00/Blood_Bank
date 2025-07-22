@@ -9,7 +9,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,9 +19,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.user_service.dto.JWTResponse;
 import com.user_service.dto.MinUserDto;
+import com.user_service.dto.RefreshTokenRequest;
 import com.user_service.dto.SearchDto;
 import com.user_service.dto.UserDto;
+import com.user_service.entities.RefreshToken;
 import com.user_service.entities.Role;
 import com.user_service.entities.Users;
 import com.user_service.exception.DetailsNotFoundException;
@@ -30,6 +32,8 @@ import com.user_service.exception.UserDetailsNotFoundException;
 import com.user_service.repositary.RoleRepositary;
 import com.user_service.repositary.UserRepositary;
 import com.user_service.service.UsersService;
+import com.user_service.util.CommonConstants;
+import com.user_service.util.Utils;
 import com.user_service.vo.UsersVo;
 import com.user_service.vo.loginUservo;
 
@@ -47,14 +51,16 @@ public class UsersServiceImpl implements UsersService {
 	private final JWTService jwtServcie;
 	private final ModelMapper uModelMapper;
 	private final AuthenticationManager authManager;
+	private final RefreshTokenServiceImpl refreshTokenServiceImpl;
 	
 	private  BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-		
+	
+	
 	@Override
-	public Users register(UsersVo userVo) {
+	public UserDto register(UsersVo userVo) {
 		// TODO Auto-generated method stub
 	   Users user = new Users();
-	   
+	   log.info("user register...." );
 		 user = Users.builder()
 				.fullName(userVo.getFullname())
 				.username(userVo.getUsername())
@@ -78,49 +84,54 @@ public class UsersServiceImpl implements UsersService {
 					    .collect(Collectors.toSet())) 
 				.build();
 		user = userRepositary.save(user);
-	
-		return user;
+		UserDto userDto = 	uModelMapper.map(user, UserDto.class);	
+		userDto.setStatus(CommonConstants.SUCESS);
+		return userDto;
 	}
 	@Override
-	public String  login(loginUservo loginUservo) {
+	@Transactional
+	public JWTResponse  login(loginUservo loginUservo) {
 		Users user = userRepositary.findByUsername(loginUservo.getUsername());
 		
-		user.setIsActive(Boolean.TRUE);
+		user.setIsActive(true);
 		user.setLastLogin(Timestamp.from(Instant.now()));
 		user.setIsPhoneNumberVerified(Boolean.TRUE);
         user.setLoginCount(Optional.ofNullable(user.getLoginCount())
         		.map(count -> count+1).orElse((long) 1) );
         
 		userRepositary.save(user);
-		log.debug("User in DB: " + user.getUsername());
+		log.info("User in DB: " + user.getUsername());
 		
-		log.debug("Password in DB: " + user.getPassword());
-		log.debug("Input password: " + loginUservo.getPassword());
-		log.debug("Matches? " + encoder.matches(loginUservo.getPassword(), user.getPassword()));
-
+		log.info("Password in DB: " + user.getPassword());
+		log.info("Input password: " + loginUservo.getPassword());
+		log.info("Matches? " + encoder.matches(loginUservo.getPassword(), user.getPassword()));
+		
 		Authentication authentication  = 
 				authManager.authenticate(new UsernamePasswordAuthenticationToken(loginUservo.getUsername(), loginUservo.getPassword()));
-		
-		  if(authentication.isAuthenticated()) {
-		         return jwtServcie.generateToken(user) ;
-		         }
-		
-		return "fail";
-		
-		
+		RefreshToken token =  refreshTokenServiceImpl.createrefreshToken(loginUservo.getUsername());
+
+		  if(authentication.isAuthenticated()) 
+                     jwtServcie.generateToken(user) ;
+                     return  JWTResponse.builder()
+                                  .accesToken(jwtServcie.generateToken(user))
+                                  .token(token.getToken())
+                                  .build();
 	}
 
 	@Override
 	public UserDto getUsersById(Integer userId) {
 		// TODO Auto-generated method stub
+		Utils.VerifyuserId(userId);
+		log.debug("user id verified :" + userId);
 	  Users user = userRepositary.findById(userId)
-			  .orElseThrow(() ->  new UserDetailsNotFoundException("User Deatils Not Found On This ID: " + userId) );
+			  .orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID + userId));
+	  
 	  UserDto uDto = new UserDto();
 	  
-	  if(user.getIsActive().equals(Boolean.TRUE)) {
+	  if(user.getIsActive()) {   
 		  uDto =  uModelMapper.map(user, UserDto.class);
 	  }else {
-		  throw new UserDetailsNotFoundException("User Not in Active. Update the Status");
+		  throw new UserDetailsNotFoundException(CommonConstants.USER_NOT_IN_ACTIVE + CommonConstants.UPDATE_THE_STATUS);
 	  }
 		return uDto;
 	}
@@ -129,8 +140,9 @@ public class UsersServiceImpl implements UsersService {
 	@Transactional
 	public MinUserDto updateUsers(Integer userId, UsersVo userVo) {
 		// TODO Auto-generated method stub
+		Utils.VerifyuserId(userId);
 		  Users user = userRepositary.findById(userId)
-				  .orElseThrow(() ->  new UserDetailsNotFoundException("User Deatils Not Found On This ID: " + userId) );
+				  .orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID+ userId) );
 		  if(Boolean.TRUE.equals(user.getIsActive())) {
 //		  user.setAddressType(userVo.getAddressType().toString());
 		  user.setUpdatedAt(LocalDateTime.now());
@@ -141,7 +153,7 @@ public class UsersServiceImpl implements UsersService {
 		  user = userRepositary.save(user);
 		  }
 		  else {
-			  throw new UserDetailsNotFoundException("User Not in Active. Update the Status");
+			  throw new UserDetailsNotFoundException(CommonConstants.USER_NOT_IN_ACTIVE + CommonConstants.UPDATE_THE_STATUS);
 		  } 
 		  MinUserDto minUserDto =   uModelMapper.map(user, MinUserDto.class);
 		return minUserDto;
@@ -152,8 +164,10 @@ public class UsersServiceImpl implements UsersService {
 //	@CacheEvict(value = "users", key = "#userId")
 	public String deleteUser(Integer userId) {
 		// TODO Auto-generated method stub
+		Utils.VerifyuserId(userId);
 	  Users user = 	userRepositary.findById(userId)
-		.orElseThrow(() ->  new UserDetailsNotFoundException("User Deatils Not Found On This ID: " + userId) );
+		.orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID+ userId) );
+	  
 	    if(Boolean.TRUE.equals(user.getIsActive()) && Boolean.TRUE.equals(user.getIsPhoneNumberVerified()) &&
 	    		Boolean.TRUE.equals(user.getIsAvailableToDonate())) 
 	    {
@@ -164,9 +178,9 @@ public class UsersServiceImpl implements UsersService {
 		
 	    }
 	    else {
-	    	throw new DetailsNotFoundException("User is not ready  to delete : " + user.getUsername());
+	    	throw new DetailsNotFoundException(CommonConstants.USER_NOT_THERE_TO_DELETE + user.getUsername());
 	    }
-		
+		log.info("delted user .." + userId);
 	
 		return "User deleted on this Id: " + user.getUserId() + " on this Username " + user.getUsername();
 	}
@@ -175,6 +189,7 @@ public class UsersServiceImpl implements UsersService {
 	@Cacheable(value = "Users" , key = "#userId")
 	public List<Users>  getAllUsers() {
 		// TODO Auto-generated method stub
+//		Utils.VerifyuserId(userId);
 	  List<Users> users = 	userRepositary.findAll();
 	  
 	          users
@@ -200,6 +215,7 @@ public class UsersServiceImpl implements UsersService {
 	@Transactional
 	public String forgotPassword(String username) {
 	Users user = 	userRepositary.findByUsername(username);
+//	Utils.VerifyuserId(user.getUserId());
 	String resetPassword = null ;
 	if(user != null && user.getIsActive().equals(Boolean.TRUE) && user.getIsPhoneNumberVerified().equals(Boolean.TRUE)) {
 		 resetPassword = user.getPhoneNumber() + UUID.randomUUID()+Instant.now().toString();
@@ -215,6 +231,7 @@ public class UsersServiceImpl implements UsersService {
 	@Override
 	public String resetPassword(String username , String resetPassword , String password) {
 		Users user = 	userRepositary.findByUsername(username);
+//		Utils.VerifyuserId(user.getUserId());
 		if(user != null && user.getIsActive().equals(Boolean.TRUE) && user.getIsPhoneNumberVerified().equals(Boolean.TRUE)) {
 			if(user.getResetToken().equalsIgnoreCase(resetPassword)) {
 		                     	user.setResetToken(null);
@@ -224,9 +241,26 @@ public class UsersServiceImpl implements UsersService {
 			user.setPassword(encoder.encode(password));
 			userRepositary.save(user);
 		} else {
-			throw new DetailsNotFoundException("User Details Not Found on this Username :" + username);
+			throw new DetailsNotFoundException(CommonConstants.USER_DETAILS_NOTFOUND_ID + username);
 		}
 		return "Password Updated for User " + username;
+	}
+	@Override
+	public JWTResponse refreshToken(RefreshTokenRequest request) {
+		 return  refreshTokenServiceImpl.findByToken(request.getRefreshToken())
+		                                           .map(refreshTokenServiceImpl::verifyExpiration)
+		                                           .map(RefreshToken::getUser)
+		                                           .map(user -> {
+		                                        	   refreshTokenServiceImpl.deleteToken(request.getRefreshToken());
+		                                        	   String newAccesToken = jwtServcie.generateToken(user);
+		                                        	   @SuppressWarnings("unused")
+													String newRefreshToken = refreshTokenServiceImpl.createrefreshToken(user.getUsername()).getToken();
+		                                              return JWTResponse.builder()
+		                                            		           .accesToken(newAccesToken)
+		                                            		           .token(request.getRefreshToken())
+		                                            		           .build();
+		                                           } ).orElseThrow(null);
+		
 	}
 
 	

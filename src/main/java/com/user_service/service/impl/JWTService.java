@@ -32,6 +32,7 @@ public class JWTService {
 	public String generateToken(Users user) {
 		Map<String , Object> claims = new HashMap<>();
 		claims.put("phoneNumber", user.getPhoneNumber());
+		claims.put("UserId", user.getUserId());
 		List<String> roles = user.getRoles().stream().map(x ->x.getRole()).collect(Collectors.toList());
 		claims.put("role", roles);
 		
@@ -40,7 +41,7 @@ public class JWTService {
 				.setClaims(claims)
 				.setSubject(user.getUsername())
 				.setIssuedAt(new Date())
-				.setExpiration(new Date(System.currentTimeMillis() + 3600000))
+				.setExpiration(new Date(System.currentTimeMillis() + 36000))
 				.signWith(getSignKey(), SignatureAlgorithm.HS256)
 				.compact();
 		

@@ -11,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.user_service.service.impl.JWTService;
 import com.user_service.service.impl.UserPrinicipalServiceImpl;
+import com.user_service.service.impl.UsersServiceImpl;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

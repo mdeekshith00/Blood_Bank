@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.user_service.vo.AddressVo;
 import com.user_service.vo.FullNameVo;
 import com.user_service.vo.RoleVo;
@@ -13,7 +14,8 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class MinUserDto {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class MinUserDto extends BaseDto{
 	
 	
     private FullNameVo fullname;

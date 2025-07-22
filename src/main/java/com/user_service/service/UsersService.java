@@ -2,11 +2,11 @@ package com.user_service.service;
 
 import java.util.List;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 
-
+import com.user_service.dto.JWTResponse;
 import com.user_service.dto.MinUserDto;
+import com.user_service.dto.RefreshTokenRequest;
 import com.user_service.dto.SearchDto;
 import com.user_service.dto.UserDto;
 import com.user_service.entities.Users;
@@ -15,9 +15,9 @@ import com.user_service.vo.loginUservo;
 
 public interface UsersService {
 	
-	Users register(UsersVo userVo);
+	UserDto register(UsersVo userVo);
 	
-	String  login(loginUservo loginUservo);
+	JWTResponse  login(loginUservo loginUservo);
 	
 	UserDto getUsersById(Integer userId);
 	
@@ -27,11 +27,13 @@ public interface UsersService {
 	
 	List<Users> getAllUsers();
 	
-	 Page<SearchDto> getPaginatedUsersandBloodGroup(int page, int size, String bloodGroup);
+     Page<SearchDto> getPaginatedUsersandBloodGroup(int page, int size, String bloodGroup);
 	 
-	 String forgotPassword(String username);
+	String forgotPassword(String username);
 	 
-	  String resetPassword(String username , String resetPassword , String password);
+	 String resetPassword(String username , String resetPassword , String password);
+	  
+	 JWTResponse refreshToken(RefreshTokenRequest request);
 
 }
  

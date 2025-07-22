@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.user_service.enums.AddressType;
 import com.user_service.vo.AddressVo;
 import com.user_service.vo.FullNameVo;
@@ -18,8 +19,8 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class SearchDto {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class SearchDto extends BaseDto {
 	
 	  private FullNameVo fullname;
 		

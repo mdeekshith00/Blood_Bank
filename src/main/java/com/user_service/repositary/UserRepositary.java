@@ -6,9 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.user_service.entities.Users;
 
+
+@Repository
 public interface UserRepositary extends JpaRepository<Users, Integer>{
 
 	Users findByUsername(String username);

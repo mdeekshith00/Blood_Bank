@@ -10,8 +10,7 @@ import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -22,10 +21,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -70,7 +71,7 @@ public class Users  implements UserDetails , Serializable {
 	private String addressType;
 	@Embedded
 	private Address address ;
-
+    @Past
 	private LocalDate dateOfBirth;
 	
 	private Boolean isAvailableToDonate;
@@ -119,7 +120,8 @@ public class Users  implements UserDetails , Serializable {
 				.toList();
 				
 	}
-
+	@OneToOne
+    private RefreshToken refreshToken;
 	
 
 }
