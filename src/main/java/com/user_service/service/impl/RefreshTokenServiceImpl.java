@@ -12,8 +12,10 @@ import com.user_service.repositary.UserRepositary;
 import com.user_service.service.RefreshTokenService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl  implements RefreshTokenService {
 	
@@ -32,6 +34,7 @@ public class RefreshTokenServiceImpl  implements RefreshTokenService {
 	}
 
 	public Optional<RefreshToken> findByToken(String token) {
+		 log.info("Searching for token: {}", token);
 		 return refreshTokenRepositary.findByToken(token);
 	}
 	public void deleteToken(String token) {

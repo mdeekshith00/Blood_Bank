@@ -1,12 +1,13 @@
 package com.user_service.controller;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,8 @@ import com.user_service.service.UsersService;
 import com.user_service.vo.UsersVo;
 import com.user_service.vo.loginUservo;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,11 +35,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "User APIs", description = "Operations related to Users")
 public class UsersController {
 	
 	private final UsersService userService;
-//	private final RefreshTokenService refreshTokenService;
 	private final ModelMapper modelMapper;
+	private final Executor virtualThreadExecutor;
 	
 	@PostMapping("/sign-up")
 	public ResponseEntity<UserDto> register(@RequestBody UsersVo userVo) {
@@ -65,11 +69,16 @@ public class UsersController {
 		return ResponseEntity.status(HttpStatus.OK).body(userService.resetPassword(username, resetPassword, password));
 	}
 	
+	@Operation(summary = "Get user by ID", description = "Returns a single user by their ID")
 	 @GetMapping("/{userId}")
-	public ResponseEntity<UserDto> getUsersById(@PathVariable Integer userId) {
-		UserDto user = userService.getUsersById(userId);
-		return  ResponseEntity.status(HttpStatus.OK).body(user);
+	public CompletableFuture<ResponseEntity<UserDto>> getUsersById(@PathVariable Integer userId) {
+ 
+		return CompletableFuture.supplyAsync(()-> {
+			UserDto user = userService.getUsersById(userId);
+			return ResponseEntity.status(HttpStatus.OK).body(user);
+		} , virtualThreadExecutor );
 	}
+	 
 	@PutMapping("/update/{userId}")
 	public ResponseEntity<MinUserDto> updateUsers(@PathVariable Integer userId,@RequestBody UsersVo userVo) {
 		return  ResponseEntity.status(HttpStatus.OK).body(userService.updateUsers(userId, userVo));
@@ -79,7 +88,7 @@ public class UsersController {
 	public ResponseEntity<?> deleteUser(@PathVariable Integer userId) {
 		return  ResponseEntity.status(HttpStatus.OK).body(userService.deleteUser(userId));
 	}
-	@PreAuthorize("ADMIN")
+//	@PreAuthorize("ADMIN")
 	@GetMapping(path = "/get-all")
 	public  ResponseEntity<List<?>> getAllUsers() {
 	   return  ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());

@@ -121,7 +121,7 @@ public class UsersServiceImpl implements UsersService {
 	@Override
 	public UserDto getUsersById(Integer userId) {
 		// TODO Auto-generated method stub
-		Utils.VerifyuserId(userId);
+//		Utils.VerifyuserId(userId);
 		log.debug("user id verified :" + userId);
 	  Users user = userRepositary.findById(userId)
 			  .orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID + userId));
@@ -186,7 +186,7 @@ public class UsersServiceImpl implements UsersService {
 	}
 
 	@Override
-	@Cacheable(value = "Users" , key = "#userId")
+//	@Cacheable(value = "Users" )
 	public List<Users>  getAllUsers() {
 		// TODO Auto-generated method stub
 //		Utils.VerifyuserId(userId);
@@ -253,13 +253,14 @@ public class UsersServiceImpl implements UsersService {
 		                                           .map(user -> {
 		                                        	   refreshTokenServiceImpl.deleteToken(request.getRefreshToken());
 		                                        	   String newAccesToken = jwtServcie.generateToken(user);
-		                                        	   @SuppressWarnings("unused")
+		                                        	   log.info("New token issued for user: {}", user.getUsername());
 													String newRefreshToken = refreshTokenServiceImpl.createrefreshToken(user.getUsername()).getToken();
 		                                              return JWTResponse.builder()
 		                                            		           .accesToken(newAccesToken)
-		                                            		           .token(request.getRefreshToken())
+		                                            		           .token(newRefreshToken)
 		                                            		           .build();
-		                                           } ).orElseThrow(null);
+		                                           } )
+                      .orElseThrow(() -> new UserDetailsNotFoundException(CommonConstants.REFRESH_TOKEN_NOT_FOUND));
 		
 	}
 

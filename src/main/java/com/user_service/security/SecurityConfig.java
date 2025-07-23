@@ -33,6 +33,13 @@ public class SecurityConfig {
 				.csrf(r->r.disable())
 				.authorizeHttpRequests(request -> request
 						 .requestMatchers("/user/sign-up" , "/user/sign-in" , "/user/refresh-token/**").permitAll()
+						 .requestMatchers(
+					                "/v3/api-docs/**",
+					                "/swagger-ui/**",
+					                "/swagger-ui.html",
+					                "/swagger-resources/**",
+					                "/webjars/**"
+					            ).permitAll()
 						.anyRequest().authenticated())
 				.httpBasic(Customizer.withDefaults())
 				.formLogin(Customizer.withDefaults())
