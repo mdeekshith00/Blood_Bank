@@ -73,7 +73,7 @@ public class Users  implements UserDetails , Serializable {
 	private Address address ;
     @Past
 	private LocalDate dateOfBirth;
-    private String donationEligibilityStatus;
+    private String donationEligibilityStatus; // eligible, not eligible, pending approval
 	private Boolean isAvailableToDonate;
 	
 	private Boolean isActive;
