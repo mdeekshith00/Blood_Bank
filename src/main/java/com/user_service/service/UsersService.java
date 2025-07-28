@@ -25,7 +25,7 @@ public interface UsersService {
 	
 	String deleteUser(Integer userId);
 	
-	List<Users> getAllUsers();
+	List<UserDto> getAllUsers();
 	
      Page<SearchDto> getPaginatedUsersandBloodGroup(int page, int size, String bloodGroup);
 	 

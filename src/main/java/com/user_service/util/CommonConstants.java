@@ -22,8 +22,10 @@ public class CommonConstants {
 //	
 //	public static final String
 //	public static final String
-//	public static final String
-//	
-//	public static final String
+	
+	public static final String USER_PHONENUMBER = "User_PhoneNumber ";
+	public static final String USER_ROLE = "User_Role:";
+	public static final String JWT_USER_ID = "JWt_UserId :";
+	public static final String JWT_ZMATER_INTERNAL_SESSION = "Jwt Internal Session:";
 
 }

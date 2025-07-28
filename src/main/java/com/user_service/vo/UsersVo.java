@@ -12,6 +12,7 @@ import com.user_service.entities.FullName;
 import com.user_service.enums.AddressType;
 import com.user_service.enums.BloodGroupType;
 import com.user_service.enums.GenderType;
+import com.user_service.enums.StatusType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -91,6 +92,8 @@ public class UsersVo {
 	private String resetToken;
 	
 	private String bio;
+	
+	private StatusType status;
 	
 	private String logInProvider;
 	

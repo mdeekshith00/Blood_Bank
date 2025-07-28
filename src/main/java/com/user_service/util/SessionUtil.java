@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.user_service.entities.Users;
 import com.user_service.exception.DetailsNotFoundException;
 import com.user_service.vo.SessionResponseVo;
 
@@ -20,9 +21,11 @@ public class SessionUtil {
 	public static SessionResponseVo retriveSession() throws JsonMappingException, JsonProcessingException {
 		SecurityContext holder = SecurityContextHolder.getContext();
 		Authentication authentication = holder.getAuthentication();
+//		System.out.println(String.valueOf(authentication.getPrincipal()));
 		return APIUtils.getMapper().readValue(String.valueOf(authentication.getPrincipal()), SessionResponseVo.class);
+		
 	}
-	@SuppressWarnings("unused")
+
 	private static SessionResponseVo sessionResponse() {
 		try {
 		return 	SessionUtil.retriveSession();
@@ -32,6 +35,11 @@ public class SessionUtil {
 			throw new DetailsNotFoundException("");
 		}
 	
+	}
+
+	public static Object createSession(Users user) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 

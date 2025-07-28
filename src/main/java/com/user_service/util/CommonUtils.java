@@ -7,12 +7,13 @@ import com.user_service.vo.SessionResponseVo;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Utils {
+public class CommonUtils {
 	
-	public Utils() {	
+	public CommonUtils() {	
 	}
 	
-	private static void VerifyField(Integer firstfield , Integer secondField , String fieldName) {
+	private static void VerifyField(String firstfield , String secondField , String fieldName) {
+		log.debug("verifyFields are: {}, {}, {}", fieldName, firstfield, secondField);
 	          if((firstfield == null || secondField == null) || firstfield.equals(secondField)) {
 	        	  log.info("comparing firstField and secondfiled :" );
 	        	  throw new DetailsNotFoundException("session verifyId failed you are not an existing user :" + fieldName);
@@ -29,9 +30,13 @@ public class Utils {
 	
 	}
 	
-	public static void  VerifyuserId(Integer userId) {
-    SessionResponseVo  sessionresponseVo = sessionResponse();
-     VerifyField(userId, sessionresponseVo.getUserId(), "UserId");
+//	public static void  VerifyuserId(Integer userId) {
+//    SessionResponseVo  sessionresponseVo = sessionResponse();
+//     VerifyField(userId, sessionresponseVo.getUserId(), "UserId");
+//	}
+	public static void verifyUserId(String userId) {
+		SessionResponseVo sessionResponseVO = sessionResponse();
+		VerifyField(userId, sessionResponseVO.getUserId(), "userId");
 	}
 	
 

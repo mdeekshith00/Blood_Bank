@@ -33,7 +33,7 @@ import com.user_service.repositary.RoleRepositary;
 import com.user_service.repositary.UserRepositary;
 import com.user_service.service.UsersService;
 import com.user_service.util.CommonConstants;
-import com.user_service.util.Utils;
+import com.user_service.util.CommonUtils;
 import com.user_service.vo.UsersVo;
 import com.user_service.vo.loginUservo;
 
@@ -76,6 +76,7 @@ public class UsersServiceImpl implements UsersService {
                 .createdAt(LocalDateTime.now())
 				.updatedAt(LocalDateTime.now())
 				.lastDonationDate(null)
+				.status("PENDING_APPROVAL")
 				.bio(userVo.getBio())
 		
 				.roles(userVo.getRoles().stream()
@@ -121,7 +122,7 @@ public class UsersServiceImpl implements UsersService {
 	@Override
 	public UserDto getUsersById(Integer userId) {
 		// TODO Auto-generated method stub
-//		Utils.VerifyuserId(userId);
+//		CommonUtils.VerifyuserId(String.valueOf(userId));
 		log.debug("user id verified :" + userId);
 	  Users user = userRepositary.findById(userId)
 			  .orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID + userId));
@@ -140,7 +141,7 @@ public class UsersServiceImpl implements UsersService {
 	@Transactional
 	public MinUserDto updateUsers(Integer userId, UsersVo userVo) {
 		// TODO Auto-generated method stub
-		Utils.VerifyuserId(userId);
+		CommonUtils.VerifyuserId(userId);
 		  Users user = userRepositary.findById(userId)
 				  .orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID+ userId) );
 		  if(Boolean.TRUE.equals(user.getIsActive())) {
@@ -164,7 +165,7 @@ public class UsersServiceImpl implements UsersService {
 //	@CacheEvict(value = "users", key = "#userId")
 	public String deleteUser(Integer userId) {
 		// TODO Auto-generated method stub
-		Utils.VerifyuserId(userId);
+		CommonUtils.VerifyuserId(userId);
 	  Users user = 	userRepositary.findById(userId)
 		.orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID+ userId) );
 	  
@@ -187,7 +188,7 @@ public class UsersServiceImpl implements UsersService {
 
 	@Override
 //	@Cacheable(value = "Users" )
-	public List<Users>  getAllUsers() {
+	public List<UserDto>  getAllUsers() {
 		// TODO Auto-generated method stub
 //		Utils.VerifyuserId(userId);
 	  List<Users> users = 	userRepositary.findAll();
@@ -199,8 +200,8 @@ public class UsersServiceImpl implements UsersService {
 	          .filter(user -> user.getIsAvailableToDonate())
 	          .filter(user -> user.getIsPhoneNumberVerified())
 	          ;
-	          
-		return users;
+	   List<UserDto> dto =    users.stream().map(user -> uModelMapper.map(user, UserDto.class)).collect(Collectors.toList());
+		return dto;
 	}
 	@SuppressWarnings("unchecked")
 	@Override

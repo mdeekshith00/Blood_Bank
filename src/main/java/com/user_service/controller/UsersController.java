@@ -71,12 +71,13 @@ public class UsersController {
 	
 	@Operation(summary = "Get user by ID", description = "Returns a single user by their ID")
 	 @GetMapping("/{userId}")
-	public CompletableFuture<ResponseEntity<UserDto>> getUsersById(@PathVariable Integer userId) {
+	public ResponseEntity<UserDto> getUsersById(@PathVariable Integer userId) {
  
-		return CompletableFuture.supplyAsync(()-> {
-			UserDto user = userService.getUsersById(userId);
-			return ResponseEntity.status(HttpStatus.OK).body(user);
-		} , virtualThreadExecutor );
+//		return CompletableFuture.supplyAsync(()-> {
+//			UserDto user = userService.getUsersById(userId);
+//			return ResponseEntity.status(HttpStatus.OK).body(user);
+//		} , virtualThreadExecutor );
+		return  ResponseEntity.status(HttpStatus.OK).body(userService.getUsersById(userId));
 	}
 	 
 	@PutMapping("/update/{userId}")

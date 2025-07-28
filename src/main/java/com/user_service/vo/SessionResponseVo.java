@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class SessionResponseVo {
 	
-	private Integer userId;
+	private String userId;
 	private String role;
 	
 

@@ -13,6 +13,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.user_service.entities.Users;
+import com.user_service.util.CommonConstants;
+import com.user_service.util.SessionUtil;
+import com.user_service.vo.JWTRoleDetails;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -30,18 +33,20 @@ public class JWTService {
 //	private Date expirationTime;
 	
 	public String generateToken(Users user) {
-		Map<String , Object> claims = new HashMap<>();
-		claims.put("phoneNumber", user.getPhoneNumber());
-		claims.put("UserId", user.getUserId());
+//		Map<String , Object> claims = new HashMap<>();
+		Claims claims = Jwts.claims().setSubject(user.getUsername());
+		claims.put(CommonConstants.USER_PHONENUMBER , user.getPhoneNumber());
+
 		List<String> roles = user.getRoles().stream().map(x ->x.getRole()).collect(Collectors.toList());
-		claims.put("role", roles);
+		claims.put(CommonConstants.USER_ROLE, roles);		
+		claims.put(CommonConstants.JWT_USER_ID, String.valueOf(user.getUserId()));
+		claims.put(CommonConstants.JWT_ZMATER_INTERNAL_SESSION, SessionUtil.createSession(user));
 		
 		return Jwts
 				.builder()
 				.setClaims(claims)
-				.setSubject(user.getUsername())
 				.setIssuedAt(new Date())
-				.setExpiration(new Date(System.currentTimeMillis() + 36000))
+				.setExpiration(new Date(System.currentTimeMillis() + 36000000))
 				.signWith(getSignKey(), SignatureAlgorithm.HS256)
 				.compact();
 		
