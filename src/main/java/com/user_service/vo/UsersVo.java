@@ -97,6 +97,6 @@ public class UsersVo {
 	
 	private String logInProvider;
 	
-	private Set<RoleVo> roles;
+	private RoleVo roles;
 
 }

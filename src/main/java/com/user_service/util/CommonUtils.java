@@ -30,10 +30,6 @@ public class CommonUtils {
 	
 	}
 	
-//	public static void  VerifyuserId(Integer userId) {
-//    SessionResponseVo  sessionresponseVo = sessionResponse();
-//     VerifyField(userId, sessionresponseVo.getUserId(), "UserId");
-//	}
 	public static void verifyUserId(String userId) {
 		SessionResponseVo sessionResponseVO = sessionResponse();
 		VerifyField(userId, sessionResponseVO.getUserId(), "userId");

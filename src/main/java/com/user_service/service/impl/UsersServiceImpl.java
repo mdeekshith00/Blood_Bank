@@ -5,11 +5,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +34,7 @@ import com.user_service.repositary.UserRepositary;
 import com.user_service.service.UsersService;
 import com.user_service.util.CommonConstants;
 import com.user_service.util.CommonUtils;
+import com.user_service.vo.RoleVo;
 import com.user_service.vo.UsersVo;
 import com.user_service.vo.loginUservo;
 
@@ -61,6 +62,11 @@ public class UsersServiceImpl implements UsersService {
 		// TODO Auto-generated method stub
 	   Users user = new Users();
 	   log.info("user register...." );
+	   
+	   RoleVo roleVo = userVo.getRoles();
+	   Role role= uModelMapper.map(roleVo, Role.class);
+	         
+	      
 		 user = Users.builder()
 				.fullName(userVo.getFullname())
 				.username(userVo.getUsername())
@@ -79,10 +85,7 @@ public class UsersServiceImpl implements UsersService {
 				.status("PENDING_APPROVAL")
 				.bio(userVo.getBio())
 		
-				.roles(userVo.getRoles().stream()
-					    .map(r -> uModelMapper.map(r, Role.class)) 
-					    .map(roleRepositary::save)            
-					    .collect(Collectors.toSet())) 
+				.roles(Set.of(role)) 
 				.build();
 		user = userRepositary.save(user);
 		UserDto userDto = 	uModelMapper.map(user, UserDto.class);	
@@ -122,7 +125,7 @@ public class UsersServiceImpl implements UsersService {
 	@Override
 	public UserDto getUsersById(Integer userId) {
 		// TODO Auto-generated method stub
-//		CommonUtils.VerifyuserId(String.valueOf(userId));
+		CommonUtils.verifyUserId(String.valueOf(userId));
 		log.debug("user id verified :" + userId);
 	  Users user = userRepositary.findById(userId)
 			  .orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID + userId));
@@ -141,7 +144,7 @@ public class UsersServiceImpl implements UsersService {
 	@Transactional
 	public MinUserDto updateUsers(Integer userId, UsersVo userVo) {
 		// TODO Auto-generated method stub
-		CommonUtils.VerifyuserId(userId);
+		CommonUtils.verifyUserId(String.valueOf(userId));
 		  Users user = userRepositary.findById(userId)
 				  .orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID+ userId) );
 		  if(Boolean.TRUE.equals(user.getIsActive())) {
@@ -165,7 +168,7 @@ public class UsersServiceImpl implements UsersService {
 //	@CacheEvict(value = "users", key = "#userId")
 	public String deleteUser(Integer userId) {
 		// TODO Auto-generated method stub
-		CommonUtils.VerifyuserId(userId);
+		CommonUtils.verifyUserId(String.valueOf(userId));
 	  Users user = 	userRepositary.findById(userId)
 		.orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID+ userId) );
 	  

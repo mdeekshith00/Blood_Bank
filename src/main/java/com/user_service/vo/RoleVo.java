@@ -1,5 +1,7 @@
 package com.user_service.vo;
 
+import com.user_service.enums.RoleType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +16,7 @@ import lombok.Setter;
 
 public class RoleVo {
 
-	private String role;
+	private RoleType role;
 	
 	private String description;
 }
