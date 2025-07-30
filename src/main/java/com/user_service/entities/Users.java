@@ -5,12 +5,14 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.CascadeType;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -21,6 +23,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -40,7 +43,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-//@JsonIdentityInfo()
 public class Users  implements UserDetails , Serializable {
 	/**
 	 * 
@@ -73,10 +75,13 @@ public class Users  implements UserDetails , Serializable {
 	private Address address ;
     @Past
 	private LocalDate dateOfBirth;
+    
     private String donationEligibilityStatus; // eligible, not eligible, pending approval
+    
 	private Boolean isAvailableToDonate;
 	
 	private Boolean isActive;
+	
 	private String status; // e.g., "ACTIVE", "INACTIVE", "BANNED", "PENDING_APPROVAL"
 	
 	private Long loginCount;
@@ -123,6 +128,10 @@ public class Users  implements UserDetails , Serializable {
 	}
 	@OneToOne
     private RefreshToken refreshToken;
+	
+	@OneToMany(mappedBy = "user")
+	@JsonManagedReference
+	private List<UserHistory> userHistory;
 	
 
 }
