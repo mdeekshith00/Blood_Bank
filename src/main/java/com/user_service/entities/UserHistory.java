@@ -39,7 +39,6 @@ public class UserHistory  implements Serializable {
 	@Column(name = "user_history_id")
 	private Integer userHistoryId;
 	
-	@Column(name = "booking_description")
 	private String description;
 
 	@Column(name = "created_at")

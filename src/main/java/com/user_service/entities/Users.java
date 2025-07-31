@@ -5,14 +5,10 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -24,7 +20,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -125,24 +120,24 @@ public class Users  implements UserDetails , Serializable {
 	@OneToOne
     private RefreshToken refreshToken;
 	
-	@OneToMany(mappedBy = "user")
-	@JsonManagedReference
-	private List<UserHistory> userHistory;
+//	@OneToMany(mappedBy = "user")
+//	@JsonManagedReference
+//	private List<UserHistory> userHistory;
 	
 	
-	public UserHistory  addHistory(UserHistory userHistory) {
-		getUserHistory().add(userHistory);
-		userHistory.setUser(this);
-		
-		return userHistory;
-	}
-	
-	public UserHistory removeHistory(UserHistory userHistory) {
-		getUserHistory().remove(userHistory);
-		userHistory.setUser(null);
-		
-		return userHistory;
-	}
+//	public UserHistory  addHistory(UserHistory userHistory) {
+//		getUserHistory().add(userHistory);
+//		userHistory.setUser(this);
+//		
+//		return userHistory;
+//	}
+//	
+//	public UserHistory removeHistory(UserHistory userHistory) {
+//		getUserHistory().remove(userHistory);
+//		userHistory.setUser(null);
+//		
+//		return userHistory;
+//	}
 
 }
 
