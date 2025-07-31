@@ -73,16 +73,13 @@ public class UsersServiceImpl implements UsersService {
 				.password(encoder.encode(userVo.getPassword()))
 				.eMail(userVo.getEMail())
 				.phoneNumber(userVo.getPhoneNumber())
-				.bloodGroup(userVo.getBloodGroup().toString())
 				.gender(userVo.getGender().toString())
 				.addressType(userVo.getAddressType().toString())
 				.address(userVo.getAddress())
-                .isAvailableToDonate(userVo.getIsAvailableToDonate())
                 .dateOfBirth(userVo.getDateOfBirth())
                 .createdAt(LocalDateTime.now())
 				.updatedAt(LocalDateTime.now())
-				.lastDonationDate(null)
-				.status("PENDING_APPROVAL")
+				.activeStatus("PENDING_APPROVAL")
 				.bio(userVo.getBio())
 		
 				.roles(Set.of(role)) 
@@ -152,7 +149,6 @@ public class UsersServiceImpl implements UsersService {
 		  user.setUpdatedAt(LocalDateTime.now());
 		  user.setEMail(userVo.getEMail());
 		  user.setGender(userVo.getGender().toString());
-		  user.setIsAvailableToDonate(userVo.getIsAvailableToDonate());
 		  user.setDateOfBirth(userVo.getDateOfBirth());
 		  user = userRepositary.save(user);
 		  }
@@ -172,13 +168,11 @@ public class UsersServiceImpl implements UsersService {
 	  Users user = 	userRepositary.findById(userId)
 		.orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID+ userId) );
 	  
-	    if(Boolean.TRUE.equals(user.getIsActive()) && Boolean.TRUE.equals(user.getIsPhoneNumberVerified()) &&
-	    		Boolean.TRUE.equals(user.getIsAvailableToDonate())) 
+	    if(Boolean.TRUE.equals(user.getIsActive()) && Boolean.TRUE.equals(user.getIsPhoneNumberVerified())) 
 	    {
 		
 		Optional.ofNullable(user.getIsActive().equals(null)).orElse(null);
 		Optional.ofNullable(user.getIsPhoneNumberVerified().equals(null)).orElse(null);
-		Optional.ofNullable(user.getIsAvailableToDonate().equals(null)).orElse(null);
 		
 	    }
 	    else {
@@ -200,7 +194,6 @@ public class UsersServiceImpl implements UsersService {
 	          .parallelStream()
 	          .filter(user -> user.getIsActive().equals(Boolean.TRUE))
 	          .filter(user -> user.isAccountNonExpired())
-	          .filter(user -> user.getIsAvailableToDonate())
 	          .filter(user -> user.getIsPhoneNumberVerified())
 	          ;
 	   List<UserDto> dto =    users.stream().map(user -> uModelMapper.map(user, UserDto.class)).collect(Collectors.toList());

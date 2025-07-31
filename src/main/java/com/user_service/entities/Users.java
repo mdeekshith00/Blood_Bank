@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -64,10 +65,9 @@ public class Users  implements UserDetails , Serializable {
 	
     private Boolean isPhoneNumberVerified;
 
-    private String bloodGroup;
-    
 	private String gender;
-     @NotNull(message = "Email cant be Empty:")
+
+    @NotNull(message = "Email cant be Empty:")
 	private String eMail;
 	@Column(name = "address_type" , nullable = false)
 	private String addressType;
@@ -76,13 +76,9 @@ public class Users  implements UserDetails , Serializable {
     @Past
 	private LocalDate dateOfBirth;
     
-    private String donationEligibilityStatus; // eligible, not eligible, pending approval
-    
-	private Boolean isAvailableToDonate;
-	
 	private Boolean isActive;
 	
-	private String status; // e.g., "ACTIVE", "INACTIVE", "BANNED", "PENDING_APPROVAL"
+	private String activeStatus; // e.g., "ACTIVE", "INACTIVE", "BANNED", "PENDING_APPROVAL"
 	
 	private Long loginCount;
 	
@@ -92,13 +88,13 @@ public class Users  implements UserDetails , Serializable {
 	
 	private LocalDateTime updatedAt;
 	
-	private LocalDateTime lastDonationDate;
-	
 	private String resetToken;
 	
 	private String bio;
 	
 	private String logInProvider;
+	
+	private Boolean wantToDonate; 
 	
 	@PrePersist
 	protected void onCreate() {
@@ -133,5 +129,23 @@ public class Users  implements UserDetails , Serializable {
 	@JsonManagedReference
 	private List<UserHistory> userHistory;
 	
+	
+	public UserHistory  addHistory(UserHistory userHistory) {
+		getUserHistory().add(userHistory);
+		userHistory.setUser(this);
+		
+		return userHistory;
+	}
+	
+	public UserHistory removeHistory(UserHistory userHistory) {
+		getUserHistory().remove(userHistory);
+		userHistory.setUser(null);
+		
+		return userHistory;
+	}
 
 }
+
+//private String donationEligibilityStatus; // eligible, not eligible, pending approval
+//private String bloodGroup;
+//private Boolean isAvailableToDonate;

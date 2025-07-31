@@ -52,9 +52,6 @@ public class UsersVo {
     private Boolean isPhoneNumberVerified;
     
     @Enumerated(EnumType.STRING)
-    private BloodGroupType bloodGroup;
-    
-    @Enumerated(EnumType.STRING)
 	private GenderType gender;
     
 	@Email(message = "Invalid email format")
@@ -69,10 +66,8 @@ public class UsersVo {
     @Size(min =2 , max = 10)
     @Embedded
 	private Address address ;
-
-	private Boolean isAvailableToDonate;
 	
-	 @JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate dateOfBirth;
 	
 	private Boolean isActive;
@@ -86,16 +81,15 @@ public class UsersVo {
 	
 	private LocalDateTime updatedAt;
 	
-	 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" )
-	private LocalDateTime lastDonationDate;
-	
 	private String resetToken;
 	
 	private String bio;
 	
-	private StatusType status;
+	private StatusType activeStatus;
 	
 	private String logInProvider;
+	
+	private Boolean wantToDonate; 
 	
 	private RoleVo roles;
 
