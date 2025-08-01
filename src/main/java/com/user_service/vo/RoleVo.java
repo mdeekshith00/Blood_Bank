@@ -2,6 +2,7 @@ package com.user_service.vo;
 
 import com.user_service.enums.RoleType;
 
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import lombok.Setter;
 @Builder
 
 public class RoleVo {
-
+     @Enumerated
 	private RoleType role;
 	
 	private String description;

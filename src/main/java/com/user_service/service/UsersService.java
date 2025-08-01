@@ -27,7 +27,7 @@ public interface UsersService {
 	
 	List<UserDto> getAllUsers();
 	
-     Page<SearchDto> getPaginatedUsersandBloodGroup(int page, int size, String bloodGroup);
+//     Page<SearchDto> getPaginatedUsersandBloodGroup(int page, int size, String bloodGroup);
 	 
 	String forgotPassword(String username);
 	 

@@ -1,11 +1,9 @@
 package com.user_service.controller;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.user_service.dto.JWTResponse;
 import com.user_service.dto.MinUserDto;
 import com.user_service.dto.RefreshTokenRequest;
-import com.user_service.dto.SearchDto;
 import com.user_service.dto.UserDto;
 import com.user_service.service.UsersService;
 import com.user_service.vo.UsersVo;
@@ -50,7 +48,7 @@ public class UsersController {
 	}
 	
 	@PostMapping("/sign-in")
-	 public ResponseEntity<?>  login(@RequestBody loginUservo loginUservo) {
+	 public ResponseEntity<JWTResponse>  login(@RequestBody loginUservo loginUservo) {
 		return ResponseEntity.ok().body(userService.login(loginUservo));
 				
 	}
@@ -94,14 +92,14 @@ public class UsersController {
 	public  ResponseEntity<List<?>> getAllUsers() {
 	   return  ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());
 	}
-	@GetMapping
-	public ResponseEntity<Page<SearchDto>> getByBloodGroupByUsers(
-	        @RequestParam(defaultValue = "0") int page,
-	        @RequestParam(defaultValue = "10") int size,
-	        @RequestParam String bloodGroup) {
-
-	    return ResponseEntity.ok(userService.getPaginatedUsersandBloodGroup(page, size, bloodGroup));
-	} 
+//	@GetMapping
+//	public ResponseEntity<Page<SearchDto>> getByBloodGroupByUsers(
+//	        @RequestParam(defaultValue = "0") int page,
+//	        @RequestParam(defaultValue = "10") int size,
+//	        @RequestParam String bloodGroup) {
+//
+//	    return ResponseEntity.ok(userService.getPaginatedUsersandBloodGroup(page, size, bloodGroup));
+//	} 
 
 
 }

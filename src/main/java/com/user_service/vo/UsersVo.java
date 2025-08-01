@@ -12,6 +12,7 @@ import com.user_service.entities.FullName;
 import com.user_service.enums.AddressType;
 import com.user_service.enums.BloodGroupType;
 import com.user_service.enums.GenderType;
+import com.user_service.enums.LogInType;
 import com.user_service.enums.StatusType;
 
 import jakarta.persistence.Column;
@@ -52,7 +53,8 @@ public class UsersVo {
     private Boolean isPhoneNumberVerified;
     
     @Enumerated(EnumType.STRING)
-	private GenderType gender;
+    private String gender;
+
     
 	@Email(message = "Invalid email format")
 	@NotNull
@@ -86,8 +88,8 @@ public class UsersVo {
 	private String bio;
 	
 	private StatusType activeStatus;
-	
-	private String logInProvider;
+	@Enumerated
+	private LogInType logInProvider;
 	
 	private Boolean wantToDonate; 
 	

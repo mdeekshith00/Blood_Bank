@@ -21,20 +21,9 @@ public class SessionUtil {
 	public static SessionResponseVo retriveSession() throws JsonMappingException, JsonProcessingException {
 		SecurityContext holder = SecurityContextHolder.getContext();
 		Authentication authentication = holder.getAuthentication();
-//		System.out.println(String.valueOf(authentication.getPrincipal()));
+//		System.out.println(String.valueOf(auth entication.getPrincipal()));
 		return APIUtils.getMapper().readValue(String.valueOf(authentication.getPrincipal()), SessionResponseVo.class);
 		
-	}
-
-	private static SessionResponseVo sessionResponse() {
-		try {
-		return 	SessionUtil.retriveSession();
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new DetailsNotFoundException("");
-		}
-	
 	}
 
 	public static Object createSession(Users user) {

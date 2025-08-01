@@ -13,8 +13,8 @@ public class CommonUtils {
 	}
 	
 	private static void VerifyField(String firstfield , String secondField , String fieldName) {
-		log.debug("verifyFields are: {}, {}, {}", fieldName, firstfield, secondField);
-	          if((firstfield == null || secondField == null) || firstfield.equals(secondField)) {
+		log.debug("verifyFields are: {}, {}, {} :", fieldName, firstfield, secondField);
+	          if((firstfield == null || secondField == null) || firstfield.equalsIgnoreCase(secondField)) {
 	        	  log.info("comparing firstField and secondfiled :" );
 	        	  throw new DetailsNotFoundException("session verifyId failed you are not an existing user :" + fieldName);
 	          }
@@ -32,7 +32,7 @@ public class CommonUtils {
 	
 	public static void verifyUserId(String userId) {
 		SessionResponseVo sessionResponseVO = sessionResponse();
-		VerifyField(userId, sessionResponseVO.getUserId(), "userId");
+		VerifyField(userId, sessionResponseVO.getJWt_UserId(), "userId");
 	}
 	
 

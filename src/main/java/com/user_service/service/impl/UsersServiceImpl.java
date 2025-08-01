@@ -27,6 +27,7 @@ import com.user_service.dto.UserDto;
 import com.user_service.entities.RefreshToken;
 import com.user_service.entities.Role;
 import com.user_service.entities.Users;
+import com.user_service.enums.StatusType;
 import com.user_service.exception.DetailsNotFoundException;
 import com.user_service.exception.UserDetailsNotFoundException;
 import com.user_service.repositary.RoleRepositary;
@@ -65,8 +66,8 @@ public class UsersServiceImpl implements UsersService {
 	   
 	   RoleVo roleVo = userVo.getRoles();
 	   Role role= uModelMapper.map(roleVo, Role.class);
-	         
-	      
+	   roleRepositary.save(role); 
+	  
 		 user = Users.builder()
 				.fullName(userVo.getFullname())
 				.username(userVo.getUsername())
@@ -79,12 +80,13 @@ public class UsersServiceImpl implements UsersService {
                 .dateOfBirth(userVo.getDateOfBirth())
                 .createdAt(LocalDateTime.now())
 				.updatedAt(LocalDateTime.now())
-				.activeStatus("PENDING_APPROVAL")
+				.activeStatus(StatusType.IN_ACTIVE.name())
 				.bio(userVo.getBio())
 		
 				.roles(Set.of(role)) 
 				.build();
 		user = userRepositary.save(user);
+		 
 		UserDto userDto = 	uModelMapper.map(user, UserDto.class);	
 		userDto.setStatus(CommonConstants.SUCESS);
 		return userDto;
@@ -93,12 +95,15 @@ public class UsersServiceImpl implements UsersService {
 	@Transactional
 	public JWTResponse  login(loginUservo loginUservo) {
 		Users user = userRepositary.findByUsername(loginUservo.getUsername());
-		
-		user.setIsActive(true);
+		if(user == null) {
+			throw new UserDetailsNotFoundException("user details not found Exception..");
+		}
+		user.setIsActive(Boolean.TRUE);
 		user.setLastLogin(Timestamp.from(Instant.now()));
 		user.setIsPhoneNumberVerified(Boolean.TRUE);
         user.setLoginCount(Optional.ofNullable(user.getLoginCount())
         		.map(count -> count+1).orElse((long) 1) );
+        user.setActiveStatus(StatusType.ACTIVE.name());
         
 		userRepositary.save(user);
 		log.info("User in DB: " + user.getUsername());
@@ -126,11 +131,13 @@ public class UsersServiceImpl implements UsersService {
 		log.debug("user id verified :" + userId);
 	  Users user = userRepositary.findById(userId)
 			  .orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID + userId));
-	  
+	  log.debug("retriveing user from db {} : " + userId);
 	  UserDto uDto = new UserDto();
 	  
 	  if(user.getIsActive()) {   
 		  uDto =  uModelMapper.map(user, UserDto.class);
+		  uDto.setStatus(CommonConstants.SUCESS);
+		  uDto.setMessage("Succesfully login in to user");
 	  }else {
 		  throw new UserDetailsNotFoundException(CommonConstants.USER_NOT_IN_ACTIVE + CommonConstants.UPDATE_THE_STATUS);
 	  }
@@ -199,15 +206,14 @@ public class UsersServiceImpl implements UsersService {
 	   List<UserDto> dto =    users.stream().map(user -> uModelMapper.map(user, UserDto.class)).collect(Collectors.toList());
 		return dto;
 	}
-	@SuppressWarnings("unchecked")
-	@Override
-	public Page<SearchDto> getPaginatedUsersandBloodGroup(int page, int size, String bloodGroup) {
-		// TODO Auto-generated method stub
-		Pageable pageable = (Pageable) PageRequest.of(page, size);
-		Page<Users> user = 	userRepositary.findByBloodGroup(bloodGroup, pageable);
-		Page<SearchDto> dto =  (Page<SearchDto>) uModelMapper.map(user, SearchDto.class);
-		return  dto;
-	}
+//	@Override
+//	public Page<SearchDto> getPaginatedUsersandBloodGroup(int page, int size, String bloodGroup) {
+//		// TODO Auto-generated method stub
+//		Pageable pageable = (Pageable) PageRequest.of(page, size);
+//		Page<Users> user = 	userRepositary.findByBloodGroup(bloodGroup, pageable);
+//		Page<SearchDto> dto =  (Page<SearchDto>) uModelMapper.map(user, SearchDto.class);
+//		return  dto;
+//	}
 	@Override
 	@Transactional
 	public String forgotPassword(String username) {

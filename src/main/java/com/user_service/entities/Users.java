@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -59,7 +60,7 @@ public class Users  implements UserDetails , Serializable {
 	private String phoneNumber;
 	
     private Boolean isPhoneNumberVerified;
-
+    @Column(nullable = true)
 	private String gender;
 
     @NotNull(message = "Email cant be Empty:")
@@ -89,6 +90,7 @@ public class Users  implements UserDetails , Serializable {
 	
 	private String logInProvider;
 	
+	@Column(name = "want_to_donate")
 	private Boolean wantToDonate; 
 	
 	@PrePersist

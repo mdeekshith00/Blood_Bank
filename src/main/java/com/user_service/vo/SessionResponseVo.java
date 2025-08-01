@@ -1,5 +1,7 @@
 package com.user_service.vo;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,8 +9,8 @@ import lombok.Setter;
 @Setter
 public class SessionResponseVo {
 	
-	private String userId;
-	private String role;
+	private String JWt_UserId;
+	private List<String> role;
 	
 
 }
