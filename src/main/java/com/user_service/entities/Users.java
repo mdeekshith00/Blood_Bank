@@ -5,15 +5,17 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,11 +23,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -63,8 +65,8 @@ public class Users  implements UserDetails , Serializable {
     @Column(nullable = true)
 	private String gender;
 
-    @NotNull(message = "Email cant be Empty:")
 	private String eMail;
+	
 	@Column(name = "address_type" , nullable = false)
 	private String addressType;
 	@Embedded
@@ -122,24 +124,24 @@ public class Users  implements UserDetails , Serializable {
 	@OneToOne
     private RefreshToken refreshToken;
 	
-//	@OneToMany(mappedBy = "user")
-//	@JsonManagedReference
-//	private List<UserHistory> userHistory;
+	@OneToMany(mappedBy = "user")
+	@JsonManagedReference
+	private List<UserHistory> userHistory;
 	
 	
-//	public UserHistory  addHistory(UserHistory userHistory) {
-//		getUserHistory().add(userHistory);
-//		userHistory.setUser(this);
-//		
-//		return userHistory;
-//	}
-//	
-//	public UserHistory removeHistory(UserHistory userHistory) {
-//		getUserHistory().remove(userHistory);
-//		userHistory.setUser(null);
-//		
-//		return userHistory;
-//	}
+	public UserHistory  addHistory(UserHistory userHistory) {
+		getUserHistory().add(userHistory);
+		userHistory.setUser(this);
+		
+		return userHistory;
+	}
+	
+	public UserHistory removeHistory(UserHistory userHistory) {
+		getUserHistory().remove(userHistory);
+		userHistory.setUser(null);
+		
+		return userHistory;
+	}
 
 }
 

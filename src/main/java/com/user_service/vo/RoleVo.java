@@ -1,5 +1,8 @@
 package com.user_service.vo;
 
+import java.util.Set;
+
+import com.user_service.entities.Users;
 import com.user_service.enums.RoleType;
 
 import jakarta.persistence.Enumerated;
@@ -20,4 +23,6 @@ public class RoleVo {
 	private RoleType role;
 	
 	private String description;
+	
+//	private Set<Users> users;
 }

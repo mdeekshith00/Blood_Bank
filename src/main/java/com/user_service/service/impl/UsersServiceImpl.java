@@ -10,9 +10,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,7 +19,6 @@ import org.springframework.stereotype.Service;
 import com.user_service.dto.JWTResponse;
 import com.user_service.dto.MinUserDto;
 import com.user_service.dto.RefreshTokenRequest;
-import com.user_service.dto.SearchDto;
 import com.user_service.dto.UserDto;
 import com.user_service.entities.RefreshToken;
 import com.user_service.entities.Role;
@@ -30,12 +26,13 @@ import com.user_service.entities.Users;
 import com.user_service.enums.StatusType;
 import com.user_service.exception.DetailsNotFoundException;
 import com.user_service.exception.UserDetailsNotFoundException;
+import com.user_service.mapper.RoleMapper;
+import com.user_service.mapper.UserMapper;
 import com.user_service.repositary.RoleRepositary;
 import com.user_service.repositary.UserRepositary;
 import com.user_service.service.UsersService;
 import com.user_service.util.CommonConstants;
 import com.user_service.util.CommonUtils;
-import com.user_service.vo.RoleVo;
 import com.user_service.vo.UsersVo;
 import com.user_service.vo.loginUservo;
 
@@ -53,6 +50,8 @@ public class UsersServiceImpl implements UsersService {
 	private final JWTService jwtServcie;
 	private final ModelMapper uModelMapper;
 	private final AuthenticationManager authManager;
+	private final UserMapper userMapper;
+	private final RoleMapper roleMapper;
 	private final RefreshTokenServiceImpl refreshTokenServiceImpl;
 	
 	private  BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
@@ -63,11 +62,18 @@ public class UsersServiceImpl implements UsersService {
 		// TODO Auto-generated method stub
 	   Users user = new Users();
 	   log.info("user register...." );
-	   
-	   RoleVo roleVo = userVo.getRoles();
-	   Role role= uModelMapper.map(roleVo, Role.class);
-	   roleRepositary.save(role); 
+//	   Role role = new Role();
+
+	  Set<Role> roles =  userVo.getRoles().stream()
+			  .filter(roleVo -> roleVo.getRole() != null)
+			  .map(roleVo -> {
+				  Role role = new Role();
+		   role.setRole(roleVo.getRole().toString());
+		   role.setDescription(roleVo.getDescription());
+		 return   roleRepositary.save(role); 
+	   }).collect(Collectors.toSet());
 	  
+	   
 		 user = Users.builder()
 				.fullName(userVo.getFullname())
 				.username(userVo.getUsername())
@@ -82,12 +88,13 @@ public class UsersServiceImpl implements UsersService {
 				.updatedAt(LocalDateTime.now())
 				.activeStatus(StatusType.IN_ACTIVE.name())
 				.bio(userVo.getBio())
-		
-				.roles(Set.of(role)) 
+				.roles(roles)
 				.build();
-		user = userRepositary.save(user);
 		 
-		UserDto userDto = 	uModelMapper.map(user, UserDto.class);	
+          userMapper.toEntity(userVo); 
+		user = userRepositary.save(user);
+
+		UserDto userDto = userMapper.toDto(user);
 		userDto.setStatus(CommonConstants.SUCESS);
 		return userDto;
 	}
@@ -135,9 +142,9 @@ public class UsersServiceImpl implements UsersService {
 	  UserDto uDto = new UserDto();
 	  
 	  if(user.getIsActive()) {   
-		  uDto =  uModelMapper.map(user, UserDto.class);
 		  uDto.setStatus(CommonConstants.SUCESS);
 		  uDto.setMessage("Succesfully login in to user");
+		  uDto = userMapper.toDto(user);
 	  }else {
 		  throw new UserDetailsNotFoundException(CommonConstants.USER_NOT_IN_ACTIVE + CommonConstants.UPDATE_THE_STATUS);
 	  }

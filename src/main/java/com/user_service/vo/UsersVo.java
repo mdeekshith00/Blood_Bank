@@ -10,8 +10,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.user_service.entities.Address;
 import com.user_service.entities.FullName;
 import com.user_service.enums.AddressType;
-import com.user_service.enums.BloodGroupType;
-import com.user_service.enums.GenderType;
 import com.user_service.enums.LogInType;
 import com.user_service.enums.StatusType;
 
@@ -93,6 +91,6 @@ public class UsersVo {
 	
 	private Boolean wantToDonate; 
 	
-	private RoleVo roles;
+	private Set<RoleVo> roles;
 
 }
