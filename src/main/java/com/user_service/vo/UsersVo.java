@@ -3,12 +3,14 @@ package com.user_service.vo;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.user_service.entities.Address;
 import com.user_service.entities.FullName;
+import com.user_service.entities.UserHistory;
 import com.user_service.enums.AddressType;
 import com.user_service.enums.LogInType;
 import com.user_service.enums.StatusType;
@@ -90,6 +92,8 @@ public class UsersVo {
 	private LogInType logInProvider;
 	
 	private Boolean wantToDonate; 
+	
+	private List<UserHistoryVo> userHistoryvo;
 	
 	private Set<RoleVo> roles;
 

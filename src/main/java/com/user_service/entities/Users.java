@@ -144,7 +144,3 @@ public class Users  implements UserDetails , Serializable {
 	}
 
 }
-
-//private String donationEligibilityStatus; // eligible, not eligible, pending approval
-//private String bloodGroup;
-//private Boolean isAvailableToDonate;
