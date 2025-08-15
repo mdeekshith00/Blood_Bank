@@ -1,6 +1,9 @@
 package com.user_service.entities;
 
+import java.io.Serializable;
 import java.time.Instant;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -22,7 +25,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-public class RefreshToken {
+public class RefreshToken implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7045596212250121284L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer tokenId;
@@ -31,9 +39,9 @@ public class RefreshToken {
 	
 	private Instant expiryDate;
 
-	
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")  
+	@JsonBackReference
     private Users user;
 
 

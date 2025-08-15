@@ -1,11 +1,9 @@
 package com.user_service.vo;
 
-import java.util.Set;
-
-import com.user_service.entities.Users;
 import com.user_service.enums.RoleType;
 
 import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,12 +15,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
 public class RoleVo {
+	
      @Enumerated
+     @NotNull(message = " role cannot be empty:")
 	private RoleType role;
 	
 	private String description;
 	
-//	private Set<Users> users;
 }

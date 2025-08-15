@@ -43,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class UsersServiceImpl implements UsersService {
 	
 	private final UserRepositary userRepositary;
@@ -62,18 +63,23 @@ public class UsersServiceImpl implements UsersService {
 		// TODO Auto-generated method stub
 	   Users user = new Users();
 	   log.info("user register...." );
-//	   Role role = new Role();
-
-	  Set<Role> roles =  userVo.getRoles().stream()
-			  .filter(roleVo -> roleVo.getRole() != null)
-			  .map(roleVo -> {
-				  Role role = new Role();
-		   role.setRole(roleVo.getRole().toString());
-		   role.setDescription(roleVo.getDescription());
-		 return   roleRepositary.save(role); 
-	   }).collect(Collectors.toSet());
-	  
+//      Role role = new Role();
 	   
+	  Set<Role> roles =  userVo.getRoles().stream().map(r -> {
+			if(r.getRole() == null) {
+				throw new DetailsNotFoundException("Role name not Found : ");
+			}
+				Role role = new Role();
+				role = Role.builder()
+						.role(r.getRole().name())
+						.description(r.getDescription()).build();
+				roleRepositary.save(role);
+				return role;
+		
+		}
+				).collect(Collectors.toSet());
+				
+
 		 user = Users.builder()
 				.fullName(userVo.getFullname())
 				.username(userVo.getUsername())
@@ -91,15 +97,15 @@ public class UsersServiceImpl implements UsersService {
 				.roles(roles)
 				.build();
 		 
-          userMapper.toEntity(userVo); 
+//          userMapper.toEntity(userVo); 
 		user = userRepositary.save(user);
 
-		UserDto userDto = userMapper.toDto(user);
+//		UserDto userDto = userMapper.toDto(user);
+		UserDto userDto = uModelMapper.map(user, UserDto.class);
 		userDto.setStatus(CommonConstants.SUCESS);
 		return userDto;
 	}
 	@Override
-	@Transactional
 	public JWTResponse  login(loginUservo loginUservo) {
 		Users user = userRepositary.findByUsername(loginUservo.getUsername());
 		if(user == null) {
@@ -134,28 +140,27 @@ public class UsersServiceImpl implements UsersService {
 	@Override
 	public UserDto getUsersById(Integer userId) {
 		// TODO Auto-generated method stub
-		CommonUtils.verifyUserId(String.valueOf(userId));
-		log.debug("user id verified :" + userId);
+//		CommonUtils.verifyUserId(String.valueOf(userId));
+		log.debug("user id verified {}:" + userId);
 	  Users user = userRepositary.findById(userId)
 			  .orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID + userId));
 	  log.debug("retriveing user from db {} : " + userId);
 	  UserDto uDto = new UserDto();
 	  
-	  if(user.getIsActive()) {   
-		  uDto.setStatus(CommonConstants.SUCESS);
-		  uDto.setMessage("Succesfully login in to user");
-		  uDto = userMapper.toDto(user);
-	  }else {
+	  if(!user.getIsActive()) {   
 		  throw new UserDetailsNotFoundException(CommonConstants.USER_NOT_IN_ACTIVE + CommonConstants.UPDATE_THE_STATUS);
+		  
 	  }
+	  uDto.setStatus(CommonConstants.SUCESS);
+	  uDto.setMessage("Succesfully login in to user");
+	  uDto = userMapper.toDto(user);
 		return uDto;
 	}
 
 	@Override
-	@Transactional
 	public MinUserDto updateUsers(Integer userId, UsersVo userVo) {
 		// TODO Auto-generated method stub
-		CommonUtils.verifyUserId(String.valueOf(userId));
+//		CommonUtils.verifyUserId(String.valueOf(userId));
 		  Users user = userRepositary.findById(userId)
 				  .orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID+ userId) );
 		  if(Boolean.TRUE.equals(user.getIsActive())) {
@@ -174,11 +179,10 @@ public class UsersServiceImpl implements UsersService {
 	}
 
 	@Override
-	@Transactional
 //	@CacheEvict(value = "users", key = "#userId")
 	public String deleteUser(Integer userId) {
 		// TODO Auto-generated method stub
-		CommonUtils.verifyUserId(String.valueOf(userId));
+//		CommonUtils.verifyUserId(String.valueOf(userId));
 	  Users user = 	userRepositary.findById(userId)
 		.orElseThrow(() ->  new UserDetailsNotFoundException(CommonConstants.USER_DATA_NOTFOUND_WITH_GIVEN_ID+ userId) );
 	  
@@ -213,16 +217,8 @@ public class UsersServiceImpl implements UsersService {
 	   List<UserDto> dto =    users.stream().map(user -> uModelMapper.map(user, UserDto.class)).collect(Collectors.toList());
 		return dto;
 	}
-//	@Override
-//	public Page<SearchDto> getPaginatedUsersandBloodGroup(int page, int size, String bloodGroup) {
-//		// TODO Auto-generated method stub
-//		Pageable pageable = (Pageable) PageRequest.of(page, size);
-//		Page<Users> user = 	userRepositary.findByBloodGroup(bloodGroup, pageable);
-//		Page<SearchDto> dto =  (Page<SearchDto>) uModelMapper.map(user, SearchDto.class);
-//		return  dto;
-//	}
+	
 	@Override
-	@Transactional
 	public String forgotPassword(String username) {
 	Users user = 	userRepositary.findByUsername(username);
 //	Utils.VerifyuserId(user.getUserId());
@@ -237,7 +233,6 @@ public class UsersServiceImpl implements UsersService {
 		return "reset your password with : " + resetPassword;
 	}
 	
-	@Transactional
 	@Override
 	public String resetPassword(String username , String resetPassword , String password) {
 		Users user = 	userRepositary.findByUsername(username);
@@ -257,7 +252,7 @@ public class UsersServiceImpl implements UsersService {
 	}
 	@Override
 	public JWTResponse refreshToken(RefreshTokenRequest request) {
-		 return  refreshTokenServiceImpl.findByToken(request.getRefreshToken())
+		JWTResponse jwtResponse = refreshTokenServiceImpl.findByToken(request.getRefreshToken())
 		                                           .map(refreshTokenServiceImpl::verifyExpiration)
 		                                           .map(RefreshToken::getUser)
 		                                           .map(user -> {
@@ -272,6 +267,7 @@ public class UsersServiceImpl implements UsersService {
 		                                           } )
                       .orElseThrow(() -> new UserDetailsNotFoundException(CommonConstants.REFRESH_TOKEN_NOT_FOUND));
 		
+		return jwtResponse;
 	}
 
 	

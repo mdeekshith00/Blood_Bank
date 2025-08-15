@@ -16,24 +16,16 @@ import com.user_service.vo.loginUservo;
 public interface UsersService {
 	
 	UserDto register(UsersVo userVo);
-	
 	JWTResponse  login(loginUservo loginUservo);
-	
 	UserDto getUsersById(Integer userId);
-	
 	MinUserDto updateUsers(Integer userId, UsersVo userVo);
-	
 	String deleteUser(Integer userId);
-	
 	List<UserDto> getAllUsers();
-	
-//     Page<SearchDto> getPaginatedUsersandBloodGroup(int page, int size, String bloodGroup);
-	 
 	String forgotPassword(String username);
-	 
-	 String resetPassword(String username , String resetPassword , String password);
-	  
-	 JWTResponse refreshToken(RefreshTokenRequest request);
+	String resetPassword(String username , String resetPassword , String password);
+	JWTResponse refreshToken(RefreshTokenRequest request);
+		
+//   Page<SearchDto> getPaginatedUsersandBloodGroup(int page, int size, String bloodGroup);
 
 }
  

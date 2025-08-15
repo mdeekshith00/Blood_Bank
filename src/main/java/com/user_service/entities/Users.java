@@ -121,7 +121,8 @@ public class Users  implements UserDetails , Serializable {
 				.toList();
 				
 	}
-	@OneToOne
+	@OneToOne(mappedBy = "user")
+	@JsonManagedReference
     private RefreshToken refreshToken;
 	
 	@OneToMany(mappedBy = "user")

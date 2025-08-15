@@ -33,7 +33,6 @@ public class JWTService {
 //	private Date expirationTime;
 	
 	public String generateToken(Users user) {
-//		Map<String , Object> claims = new HashMap<>();
 		Claims claims = Jwts.claims().setSubject(user.getUsername());
 		claims.put(CommonConstants.USER_PHONENUMBER , user.getPhoneNumber());
 

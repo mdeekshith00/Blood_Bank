@@ -32,7 +32,7 @@ public class CommonUtils {
 	
 	public static void verifyUserId(String userId) {
 		SessionResponseVo sessionResponseVO = sessionResponse();
-		VerifyField(userId, sessionResponseVO.getJWt_UserId(), "userId");
+		VerifyField(userId, sessionResponseVO.getJWt_UserId() , "userId");
 	}
 	
 

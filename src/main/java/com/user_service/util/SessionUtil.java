@@ -21,7 +21,6 @@ public class SessionUtil {
 	public static SessionResponseVo retriveSession() throws JsonMappingException, JsonProcessingException {
 		SecurityContext holder = SecurityContextHolder.getContext();
 		Authentication authentication = holder.getAuthentication();
-//		System.out.println(String.valueOf(auth entication.getPrincipal()));
 		return APIUtils.getMapper().readValue(String.valueOf(authentication.getPrincipal()), SessionResponseVo.class);
 		
 	}

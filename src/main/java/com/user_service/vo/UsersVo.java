@@ -10,7 +10,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.user_service.entities.Address;
 import com.user_service.entities.FullName;
-import com.user_service.entities.UserHistory;
 import com.user_service.enums.AddressType;
 import com.user_service.enums.LogInType;
 import com.user_service.enums.StatusType;

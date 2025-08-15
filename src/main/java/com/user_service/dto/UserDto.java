@@ -1,6 +1,5 @@
 package com.user_service.dto;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;

@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.user_service.entities.RefreshToken;
+import com.user_service.exception.UserDetailsNotFoundException;
 import com.user_service.repositary.RefreshTokenrepositary;
 import com.user_service.repositary.UserRepositary;
 import com.user_service.service.RefreshTokenService;
@@ -23,19 +24,20 @@ public class RefreshTokenServiceImpl  implements RefreshTokenService {
 	private final UserRepositary rUserRepositary;
 	
 	public RefreshToken createrefreshToken(String username) {
-		RefreshToken refreshtoken = 	RefreshToken.builder()
-		                 .user(rUserRepositary.findByUsername(username))
-		                 .token(UUID.randomUUID().toString())
-		                 .expiryDate(Instant.now())
+		RefreshToken refreshToken = 	RefreshToken.builder()
+				         .user(rUserRepositary.findByUsername(username))
+		                 .token((UUID.randomUUID() + username).toString())
+		                 .expiryDate(Instant.now().plusSeconds(3600))
 		                 .build();
 		
-		return refreshTokenRepositary.save(refreshtoken);
+		return refreshTokenRepositary.save(refreshToken);
 		
 	}
 
 	public Optional<RefreshToken> findByToken(String token) {
 		 log.info("Searching for token: {}", token);
-		 return refreshTokenRepositary.findByToken(token);
+		 return Optional.ofNullable(refreshTokenRepositary.findByToken(token)
+				 .orElseThrow(() -> new UserDetailsNotFoundException("token not found " + token)));
 	}
 	public void deleteToken(String token) {
 		  refreshTokenRepositary.findByToken(token);

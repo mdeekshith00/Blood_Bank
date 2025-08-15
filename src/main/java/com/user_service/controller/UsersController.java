@@ -1,9 +1,7 @@
 package com.user_service.controller;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.user_service.dto.BaseDto;
 import com.user_service.dto.JWTResponse;
 import com.user_service.dto.MinUserDto;
 import com.user_service.dto.RefreshTokenRequest;
@@ -37,14 +36,12 @@ import lombok.extern.slf4j.Slf4j;
 public class UsersController {
 	
 	private final UsersService userService;
-	private final ModelMapper modelMapper;
-	private final Executor virtualThreadExecutor;
+//	private final Executor virtualThreadExecutor;
 	
 	@PostMapping("/sign-up")
-	public ResponseEntity<UserDto> register(@RequestBody UsersVo userVo) {
+	public ResponseEntity<BaseDto> register(@RequestBody UsersVo userVo) {
 		UserDto user = 	userService.register(userVo);
-	  UserDto userdto =   modelMapper.map(user, UserDto.class);
-		return  ResponseEntity.status(HttpStatus.CREATED).body(userdto);
+		return  ResponseEntity.status(HttpStatus.CREATED).body(user);
 	}
 	
 	@PostMapping("/sign-in")
@@ -69,7 +66,7 @@ public class UsersController {
 	
 	@Operation(summary = "Get user by ID", description = "Returns a single user by their ID")
 	 @GetMapping("/{userId}")
-	public ResponseEntity<UserDto> getUsersById(@PathVariable Integer userId) {
+	public ResponseEntity<BaseDto> getUsersById(@PathVariable Integer userId) {
  
 //		return CompletableFuture.supplyAsync(()-> {
 //			UserDto user = userService.getUsersById(userId);
@@ -79,7 +76,7 @@ public class UsersController {
 	}
 	 
 	@PutMapping("/update/{userId}")
-	public ResponseEntity<MinUserDto> updateUsers(@PathVariable Integer userId,@RequestBody UsersVo userVo) {
+	public ResponseEntity<BaseDto> updateUsers(@PathVariable Integer userId,@RequestBody UsersVo userVo) {
 		return  ResponseEntity.status(HttpStatus.OK).body(userService.updateUsers(userId, userVo));
 	}
 	
